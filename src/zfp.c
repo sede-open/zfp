@@ -117,6 +117,9 @@ zfp_field_alloc(void)
     field->nx = field->ny = field->nz = field->nw = 0;
     field->sx = field->sy = field->sz = field->sw = 0;
     field->data = 0;
+#ifdef ZFP_WITH_CUDA
+    field->cuStream = 0;
+#endif
   }
   return field;
 }

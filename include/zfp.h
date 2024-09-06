@@ -8,9 +8,14 @@
 #define ZFP_H
 
 #include "zfp/bitstream.h"
+#include "streamstruct.h"
 #include "zfp/version.h"
 #include "zfp/internal/zfp/system.h"
 #include "zfp/internal/zfp/types.h"
+
+#ifdef ZFP_WITH_CUDA
+#include <cuda_runtime_api.h>
+#endif
 
 /* macros ------------------------------------------------------------------ */
 
@@ -148,6 +153,9 @@ typedef struct {
   size_t nx, ny, nz, nw;    /* sizes (zero for unused dimensions) */
   ptrdiff_t sx, sy, sz, sw; /* strides (zero for contiguous array a[nw][nz][ny][nx]) */
   void* data;               /* pointer to array data */
+#ifdef ZFP_WITH_CUDA
+  cudaStream_t cuStream;    /* CUDA stream */
+#endif
 } zfp_field;
 
 #ifdef __cplusplus
@@ -840,6 +848,16 @@ void zfp_demote_int32_to_int8(int8* oblock, const int32* iblock, uint dims);
 void zfp_demote_int32_to_uint8(uint8* oblock, const int32* iblock, uint dims);
 void zfp_demote_int32_to_int16(int16* oblock, const int32* iblock, uint dims);
 void zfp_demote_int32_to_uint16(uint16* oblock, const int32* iblock, uint dims);
+
+#ifdef ZFP_WITH_CUDA
+size_t zfpEncodeGpuStream(zfp_stream *stream,
+                    zfp_field *field,
+                    cudaStream_t custream);
+
+size_t zfpDecodeGpuStream(zfp_stream *stream,
+                    zfp_field *field,
+                    cudaStream_t custream);
+#endif
 
 #ifdef __cplusplus
 }
